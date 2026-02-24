@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Bible Quiz Game</title>
+
+<style>
+body{
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,#1e3c72,#6a0572);
+    font-family:Arial, sans-serif;
+    color:white;
+}
+
+.container{
+    background:#0b132b;
+    padding:50px;
+    border-radius:25px;
+    width:750px;
+    max-width:95%;
+    text-align:center;
+    box-shadow:0 0 40px rgba(255,215,0,0.8);
+}
+
+h1{font-size:32px;margin-bottom:20px;}
+
+input{
+    padding:12px;
+    width:85%;
+    border-radius:10px;
+    border:none;
+    font-size:16px;
+    margin-bottom:15px;
+}
+
+button{
+    padding:12px 30px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+    font-size:15px;
+    margin:8px auto;
+    display:block;
+    transition:0.3s;
+}
+
+button:hover{transform:scale(1.05);}
+
+.optionBtn{width:80%;margin:8px auto;}
+
+#result{font-size:20px;margin-top:15px;font-weight:bold;}
+
+.leaderboard-box{
+    margin-top:25px;
+    padding:20px;
+    border-radius:20px;
+    background:rgba(255,255,255,0.1);
+    box-shadow:0 0 15px gold;
+}
+
+#leaderboard{list-style:none;padding:0;}
+#leaderboard li{
+    padding:10px;
+    margin:6px 0;
+    border-radius:10px;
+    background:rgba(0,0,0,0.6);
+    font-weight:bold;
+}
+
+#leaderboard li:nth-child(1){background:gold;color:black;}
+#leaderboard li:nth-child(2){background:silver;color:black;}
+#leaderboard li:nth-child(3){background:#cd7f32;color:black;}
+
+.firework{
+    position:fixed;
+    width:10px;
+    height:10px;
+    background:yellow;
+    border-radius:50%;
+    animation:explode 1s ease-out forwards;
+}
+@keyframes explode{
+    from{transform:scale(1);opacity:1;}
+    to{transform:scale(20);opacity:0;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h1>📖 Bible Quiz Game</h1>
+
+<div id="startBox">
+<input type="text" id="username" placeholder="Enter your name">
+<button onclick="startQuiz()">Start Quiz</button>
+</div>
+
+<div id="quizBox" style="display:none;">
+<h3 id="question"></h3>
+<div id="options"></div>
+</div>
+
+<div id="result"></div>
+
+<button onclick="restartGame()" id="restartBtn" style="display:none;background:red;color:white;">
+Restart Game
+</button>
+
+<div class="leaderboard-box">
+<h3>🏆 Leaderboard</h3>
+<ul id="leaderboard"></ul>
+</div>
+</div>
+
+<script>
+
+/* TRUE / FALSE QUESTIONS */
+let tfQuestions=[
+{q:"Jesus was born in Bethlehem.",a:["True","False"],correct:"True"},
+{q:"Moses built the ark.",a:["True","False"],correct:"False"},
+{q:"The Bible has 66 books.",a:["True","False"],correct:"True"},
+{q:"David killed Goliath.",a:["True","False"],correct:"True"},
+{q:"Noah parted the Red Sea.",a:["True","False"],correct:"False"},
+{q:"Jonah was swallowed by a fish.",a:["True","False"],correct:"True"}
+];
+
+/* MULTIPLE CHOICE QUESTIONS */
+let mcqQuestions=[
+{q:"Who built the ark?",a:["Moses","Noah","David","Peter"],correct:"Noah"},
+{q:"Who killed Goliath?",a:["Saul","David","Samuel","Solomon"],correct:"David"},
+{q:"First book of Bible?",a:["Exodus","Genesis","Matthew","Luke"],correct:"Genesis"},
+{q:"Who denied Jesus three times?",a:["Peter","John","Paul","James"],correct:"Peter"},
+{q:"Who built the temple?",a:["David","Saul","Solomon","Moses"],correct:"Solomon"},
+{q:"Who was swallowed by a fish?",a:["Jonah","Elijah","Paul","Peter"],correct:"Jonah"}
+];
+
+let allQuestions=[...tfQuestions, ...mcqQuestions]; // MIXED
+
+let selectedQuestions=[];
+let currentIndex=0;
+let score=0;
+let username="";
+
+function startQuiz(){
+username=document.getElementById("username").value;
+if(username===""){alert("Enter your name!");return;}
+
+score=0;
+currentIndex=0;
+
+document.getElementById("startBox").style.display="none";
+document.getElementById("quizBox").style.display="block";
+document.getElementById("result").innerHTML="";
+document.getElementById("restartBtn").style.display="none";
+
+/* RANDOM 10 MIXED QUESTIONS */
+selectedQuestions=[...allQuestions]
+.sort(()=>0.5-Math.random())
+.slice(0,10);
+
+showQuestion();
+}
+
+function showQuestion(){
+let q=selectedQuestions[currentIndex];
+document.getElementById("question").innerText=
+"Question "+(currentIndex+1)+": "+q.q;
+
+let optionsDiv=document.getElementById("options");
+optionsDiv.innerHTML="";
+
+q.a.forEach(option=>{
+let btn=document.createElement("button");
+btn.innerText=option;
+btn.className="optionBtn";
+btn.onclick=()=>checkAnswer(option);
+optionsDiv.appendChild(btn);
+});
+}
+
+function checkAnswer(answer){
+let correct=selectedQuestions[currentIndex].correct;
+
+if(answer!==correct){
+document.getElementById("quizBox").style.display="none";
+document.getElementById("result").innerHTML=
+"❌ Wrong Answer! Game Over, "+username+"!";
+document.getElementById("restartBtn").style.display="block";
+return;
+}
+
+score++;
+
+setTimeout(()=>{
+currentIndex++;
+if(currentIndex<selectedQuestions.length){
+showQuestion();
+}else{
+winGame();
+}
+},600);
+}
+
+function winGame(){
+document.getElementById("quizBox").style.display="none";
+document.getElementById("result").innerHTML=
+"🎉 Congratulations "+username+"! You answered all correctly!";
+document.getElementById("restartBtn").style.display="block";
+
+saveScore();
+showLeaderboard();
+fireworks();
+}
+
+function restartGame(){
+document.getElementById("startBox").style.display="block";
+document.getElementById("quizBox").style.display="none";
+document.getElementById("result").innerHTML="";
+document.getElementById("restartBtn").style.display="none";
+}
+
+function saveScore(){
+let scores=JSON.parse(localStorage.getItem("bibleLeaderboard"))||[];
+scores.push({name:username,score:score});
+localStorage.setItem("bibleLeaderboard",JSON.stringify(scores));
+}
+
+function showLeaderboard(){
+let leaderboard=document.getElementById("leaderboard");
+leaderboard.innerHTML="";
+let scores=JSON.parse(localStorage.getItem("bibleLeaderboard"))||[];
+
+scores.sort((a,b)=>b.score-a.score);
+
+scores.forEach((s,i)=>{
+let li=document.createElement("li");
+li.innerText=(i+1)+". "+s.name+" - "+s.score;
+leaderboard.appendChild(li);
+});
+}
+
+function fireworks(){
+for(let i=0;i<25;i++){
+let fw=document.createElement("div");
+fw.className="firework";
+fw.style.left=Math.random()*window.innerWidth+"px";
+fw.style.top=Math.random()*window.innerHeight+"px";
+document.body.appendChild(fw);
+setTimeout(()=>fw.remove(),1000);
+}
+}
+
+showLeaderboard();
+
+</script>
+</body>
+</html>
