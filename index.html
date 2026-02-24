@@ -130,15 +130,39 @@ let tfQuestions=[
 ];
 
 /* MULTIPLE CHOICE QUESTIONS */
-let mcqQuestions=[
-{q:"Who built the ark?",a:["Moses","Noah","David","Peter"],correct:"Noah"},
-{q:"Who killed Goliath?",a:["Saul","David","Samuel","Solomon"],correct:"David"},
-{q:"First book of Bible?",a:["Exodus","Genesis","Matthew","Luke"],correct:"Genesis"},
-{q:"Who denied Jesus three times?",a:["Peter","John","Paul","James"],correct:"Peter"},
-{q:"Who built the temple?",a:["David","Saul","Solomon","Moses"],correct:"Solomon"},
-{q:"Who was swallowed by a fish?",a:["Jonah","Elijah","Paul","Peter"],correct:"Jonah"}
+/* MULTIPLE CHOICE QUESTIONS - தமிழில் */
+let mcqQuestions = [
+  {
+    q: "யார் கப்பலை கட்டினார்?",
+    a: ["மோசே", "நோவா", "தாவித்", "பேதுரு"],
+    correct: "நோவா"
+  },
+  {
+    q: "யார் கோலியாத்தை கொன்றார்?",
+    a: ["சோல்", "தாவித்", "சாமுவேல்", "சாலமோன்"],
+    correct: "தாவித்"
+  },
+  {
+    q: "பைபிளில் முதல் புத்தகம் எது?",
+    a: ["எக்சோடஸ்", "ஜெனசிஸ்", "மத்தேயு", "லூக்"],
+    correct: "ஜெனசிஸ்"
+  },
+  {
+    q: "யார் இயேசுவை மூன்று முறை நிராகரித்தார்?",
+    a: ["பேதுரு", "ஜான்", "பவுல்", "ஜேம்ஸ்"],
+    correct: "பேதுரு"
+  },
+  {
+    q: "யார் ஆலயத்தை கட்டினார்?",
+    a: ["தாவித்", "சோல்", "சாலமோன்", "மோசே"],
+    correct: "சாலமோன்"
+  },
+  {
+    q: "யார் மீனில் விழுந்தார்?",
+    a: ["யோனா", "எலியா", "பவுல்", "பேதுரு"],
+    correct: "யோனா"
+  }
 ];
-
 let allQuestions=[...tfQuestions, ...mcqQuestions]; // MIXED
 
 let selectedQuestions=[];
