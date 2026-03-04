@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Bible Quiz Game</title>
+<title>Ultimate Bible Quiz</title>
+<meta charset="UTF-8">
 
 <style>
 body{
@@ -10,90 +11,174 @@ body{
     display:flex;
     justify-content:center;
     align-items:center;
-    background:linear-gradient(135deg,#1e3c72,#6a0572);
     font-family:Arial, sans-serif;
     color:white;
+    overflow:hidden;
+    background:linear-gradient(135deg,#1e3c72,#6a0572);
+}
+
+/* Animated Background */
+body::before{
+    content:"";
+    position:absolute;
+    width:200%;
+    height:200%;
+    background-image:radial-gradient(white 1px, transparent 1px);
+    background-size:50px 50px;
+    animation:moveBg 60s linear infinite;
+    opacity:0.15;
+}
+@keyframes moveBg{
+    from{transform:translate(0,0);}
+    to{transform:translate(-500px,-500px);}
 }
 
 .container{
+    position:relative;
     background:#0b132b;
-    padding:50px;
+    padding:40px;
     border-radius:25px;
     width:750px;
     max-width:95%;
     text-align:center;
-    box-shadow:0 0 40px rgba(255,215,0,0.8);
+    box-shadow:0 0 40px gold;
+    z-index:1;
 }
 
-h1{font-size:32px;margin-bottom:20px;}
+h1{margin-bottom:15px;}
 
 input{
     padding:12px;
     width:85%;
     border-radius:10px;
     border:none;
-    font-size:16px;
     margin-bottom:15px;
 }
 
 button{
-    padding:12px 30px;
+    padding:12px 25px;
     border:none;
     border-radius:10px;
     cursor:pointer;
     font-weight:bold;
-    font-size:15px;
-    margin:8px auto;
-    display:block;
+    margin:8px;
     transition:0.3s;
 }
-
 button:hover{transform:scale(1.05);}
 
-.optionBtn{width:80%;margin:8px auto;}
-
-#result{font-size:20px;margin-top:15px;font-weight:bold;}
-
-.leaderboard-box{
-    margin-top:25px;
-    padding:20px;
-    border-radius:20px;
-    background:rgba(255,255,255,0.1);
-    box-shadow:0 0 15px gold;
+.optionBtn{
+    width:80%;
+    display:block;
+    margin:8px auto;
 }
 
-#leaderboard{list-style:none;padding:0;}
-#leaderboard li{
-    padding:10px;
-    margin:6px 0;
-    border-radius:10px;
-    background:rgba(0,0,0,0.6);
+.timer{
     font-weight:bold;
+    margin-bottom:8px;
+}
+
+.progress{
+    width:100%;
+    background:#444;
+    border-radius:10px;
+    overflow:hidden;
+    height:15px;
+    margin-bottom:15px;
+}
+.progress-bar{
+    height:100%;
+    width:0%;
+    background:lime;
+    transition:0.4s;
+}
+
+.leaderboard-box{
+    margin-top:20px;
+    padding:15px;
+    border-radius:15px;
+    background:rgba(255,255,255,0.1);
+}
+
+#leaderboard li{
+    list-style:none;
+    padding:8px;
+    margin:5px 0;
+    border-radius:8px;
+    background:rgba(0,0,0,0.6);
 }
 
 #leaderboard li:nth-child(1){background:gold;color:black;}
 #leaderboard li:nth-child(2){background:silver;color:black;}
 #leaderboard li:nth-child(3){background:#cd7f32;color:black;}
 
-.firework{
-    position:fixed;
-    width:10px;
-    height:10px;
-    background:yellow;
-    border-radius:50%;
-    animation:explode 1s ease-out forwards;
+/* Centered Restart Button */
+.restart-btn{
+    display:none;
+    background:red;
+    color:white;
+    padding:12px 30px;
+    border:none;
+    border-radius:12px;
+    font-weight:bold;
+    font-size:16px;
+    margin:20px auto;
 }
-@keyframes explode{
-    from{transform:scale(1);opacity:1;}
-    to{transform:scale(20);opacity:0;}
+
+/* Floating Music Button */
+.music-btn{
+    position:fixed;
+    top:15px;
+    right:15px;
+    width:45px;
+    height:45px;
+    border-radius:50%;
+    border:none;
+    background:gold;
+    color:black;
+    font-size:18px;
+    cursor:pointer;
+    box-shadow:0 0 15px gold;
+    z-index:999;
+    transition:0.3s;
+}
+.music-btn:hover{transform:scale(1.1);}
+.music-btn.off{
+    background:#555;
+    color:white;
+    box-shadow:0 0 10px #aaa;
+}
+
+/* Firework Particles */
+.firework-particle{
+    position:fixed;
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    pointer-events:none;
 }
 </style>
 </head>
 
 <body>
 
+<!-- Floating Music Button -->
+<button class="music-btn off" id="musicBtn" onclick="toggleMusic()">🎵</button>
+
+<!-- AUDIO -->
+<audio id="bgMusic" loop>
+<source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9b9d0f.mp3?filename=worship-ambient-110397.mp3">
+</audio>
+
+<audio id="correctSound">
+<source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_7bdb9b4e50.mp3?filename=correct-2-46134.mp3">
+</audio>
+
+<audio id="wrongSound">
+<source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_9c4c6b32fa.mp3?filename=error-2-126514.mp3">
+</audio>
+
 <div class="container">
-<h1>📖 Bible Quiz Game</h1>
+<h1>📖 Ultimate Bible Quiz</h1>
 
 <div id="startBox">
 <input type="text" id="username" placeholder="Enter your name">
@@ -101,156 +186,128 @@ button:hover{transform:scale(1.05);}
 </div>
 
 <div id="quizBox" style="display:none;">
+<div class="timer">⏳ Time Left: <span id="time">15</span>s</div>
+<div class="progress"><div class="progress-bar" id="progressBar"></div></div>
 <h3 id="question"></h3>
 <div id="options"></div>
 </div>
 
 <div id="result"></div>
 
-<button onclick="restartGame()" id="restartBtn" style="display:none;background:red;color:white;">
-Restart Game
-</button>
+<button onclick="restartGame()" id="restartBtn" class="restart-btn">Restart</button>
 
 <div class="leaderboard-box">
-<h3>🏆 Leaderboard</h3>
+<h3>🏆 Top 10 Leaderboard</h3>
 <ul id="leaderboard"></ul>
+<button onclick="clearLeaderboard()">Clear</button>
 </div>
+
 </div>
 
 <script>
 
-/* TRUE / FALSE QUESTIONS */
-let tfQuestions=[
+let questions=[
 {q:"Jesus was born in Bethlehem.",a:["True","False"],correct:"True"},
-{q:"Moses built the ark.",a:["True","False"],correct:"False"},
-{q:"The Bible has 66 books.",a:["True","False"],correct:"True"},
 {q:"David killed Goliath.",a:["True","False"],correct:"True"},
-{q:"Noah parted the Red Sea.",a:["True","False"],correct:"False"},
-{q:"Jonah was swallowed by a fish.",a:["True","False"],correct:"True"}
+{q:"The Bible has 66 books.",a:["True","False"],correct:"True"},
+{q:"யார் கப்பலை கட்டினார்?",a:["மோசே","நோவா","தாவித்","பேதுரு"],correct:"நோவா"},
+{q:"பைபிளில் முதல் புத்தகம் எது?",a:["எக்சோடஸ்","ஜெனசிஸ்","மத்தேயு","லூக்"],correct:"ஜெனசிஸ்"},
+{q:"யார் இயேசுவை மூன்று முறை நிராகரித்தார்?",a:["பேதுரு","ஜான்","பவுல்","ஜேம்ஸ்"],correct:"பேதுரு"}
 ];
 
-/* MULTIPLE CHOICE QUESTIONS */
-/* MULTIPLE CHOICE QUESTIONS - தமிழில் */
-let mcqQuestions = [
-  {
-    q: "யார் கப்பலை கட்டினார்?",
-    a: ["மோசே", "நோவா", "தாவித்", "பேதுரு"],
-    correct: "நோவா"
-  },
-  {
-    q: "யார் கோலியாத்தை கொன்றார்?",
-    a: ["சோல்", "தாவித்", "சாமுவேல்", "சாலமோன்"],
-    correct: "தாவித்"
-  },
-  {
-    q: "பைபிளில் முதல் புத்தகம் எது?",
-    a: ["எக்சோடஸ்", "ஜெனசிஸ்", "மத்தேயு", "லூக்"],
-    correct: "ஜெனசிஸ்"
-  },
-  {
-    q: "யார் இயேசுவை மூன்று முறை நிராகரித்தார்?",
-    a: ["பேதுரு", "ஜான்", "பவுல்", "ஜேம்ஸ்"],
-    correct: "பேதுரு"
-  },
-  {
-    q: "யார் ஆலயத்தை கட்டினார்?",
-    a: ["தாவித்", "சோல்", "சாலமோன்", "மோசே"],
-    correct: "சாலமோன்"
-  },
-  {
-    q: "யார் மீனில் விழுந்தார்?",
-    a: ["யோனா", "எலியா", "பவுல்", "பேதுரு"],
-    correct: "யோனா"
-  }
-];
-let allQuestions=[...tfQuestions, ...mcqQuestions]; // MIXED
-
-let selectedQuestions=[];
-let currentIndex=0;
-let score=0;
-let username="";
+let selected=[], index=0, score=0, timer, timeLeft=15, username="";
 
 function startQuiz(){
 username=document.getElementById("username").value;
-if(username===""){alert("Enter your name!");return;}
+if(username===""){alert("Enter name!");return;}
 
-score=0;
-currentIndex=0;
+selected=[...questions].sort(()=>0.5-Math.random());
+index=0; score=0;
 
 document.getElementById("startBox").style.display="none";
 document.getElementById("quizBox").style.display="block";
 document.getElementById("result").innerHTML="";
 document.getElementById("restartBtn").style.display="none";
 
-/* RANDOM 10 MIXED QUESTIONS */
-selectedQuestions=[...allQuestions]
-.sort(()=>0.5-Math.random())
-.slice(0,10);
-
 showQuestion();
 }
 
 function showQuestion(){
-let q=selectedQuestions[currentIndex];
-document.getElementById("question").innerText=
-"Question "+(currentIndex+1)+": "+q.q;
+let q=selected[index];
+document.getElementById("question").innerText="Question "+(index+1)+": "+q.q;
 
-let optionsDiv=document.getElementById("options");
-optionsDiv.innerHTML="";
+let progress=(index/selected.length)*100;
+document.getElementById("progressBar").style.width=progress+"%";
 
-q.a.forEach(option=>{
+let options=document.getElementById("options");
+options.innerHTML="";
+q.a.forEach(opt=>{
 let btn=document.createElement("button");
-btn.innerText=option;
+btn.innerText=opt;
 btn.className="optionBtn";
-btn.onclick=()=>checkAnswer(option);
-optionsDiv.appendChild(btn);
+btn.onclick=()=>checkAnswer(opt);
+options.appendChild(btn);
 });
+
+startTimer();
 }
 
-function checkAnswer(answer){
-let correct=selectedQuestions[currentIndex].correct;
+function startTimer(){
+timeLeft=15;
+document.getElementById("time").innerText=timeLeft;
+clearInterval(timer);
+timer=setInterval(()=>{
+timeLeft--;
+document.getElementById("time").innerText=timeLeft;
+if(timeLeft<=0){
+clearInterval(timer);
+gameOver("⏳ Time's up!");
+}
+},1000);
+}
 
-if(answer!==correct){
-document.getElementById("quizBox").style.display="none";
-document.getElementById("result").innerHTML=
-"❌ Wrong Answer! Game Over, "+username+"!";
-document.getElementById("restartBtn").style.display="block";
+function checkAnswer(ans){
+clearInterval(timer);
+let correct=selected[index].correct;
+
+if(ans!==correct){
+document.getElementById("wrongSound").play();
+gameOver("❌ Wrong! Correct answer: "+correct);
 return;
 }
 
-score++;
+document.getElementById("correctSound").play();
+score++; index++;
 
-setTimeout(()=>{
-currentIndex++;
-if(currentIndex<selectedQuestions.length){
-showQuestion();
-}else{
-winGame();
+if(index<selected.length){ showQuestion(); }
+else{ winGame(); }
 }
-},600);
+
+function gameOver(msg){
+document.getElementById("quizBox").style.display="none";
+document.getElementById("result").innerHTML=msg;
+document.getElementById("restartBtn").style.display="block";
 }
 
 function winGame(){
 document.getElementById("quizBox").style.display="none";
-document.getElementById("result").innerHTML=
-"🎉 Congratulations "+username+"! You answered all correctly!";
+document.getElementById("result").innerHTML="🎉 Congratulations "+username+"! Score: "+score;
 document.getElementById("restartBtn").style.display="block";
-
-saveScore();
-showLeaderboard();
-fireworks();
+saveScore(); showLeaderboard(); fireworks();
 }
 
 function restartGame(){
 document.getElementById("startBox").style.display="block";
 document.getElementById("quizBox").style.display="none";
-document.getElementById("result").innerHTML="";
 document.getElementById("restartBtn").style.display="none";
+document.getElementById("result").innerHTML="";
 }
 
 function saveScore(){
 let scores=JSON.parse(localStorage.getItem("bibleLeaderboard"))||[];
 scores.push({name:username,score:score});
+scores.sort((a,b)=>b.score-a.score);
+scores=scores.slice(0,10);
 localStorage.setItem("bibleLeaderboard",JSON.stringify(scores));
 }
 
@@ -258,9 +315,6 @@ function showLeaderboard(){
 let leaderboard=document.getElementById("leaderboard");
 leaderboard.innerHTML="";
 let scores=JSON.parse(localStorage.getItem("bibleLeaderboard"))||[];
-
-scores.sort((a,b)=>b.score-a.score);
-
 scores.forEach((s,i)=>{
 let li=document.createElement("li");
 li.innerText=(i+1)+". "+s.name+" - "+s.score;
@@ -268,15 +322,57 @@ leaderboard.appendChild(li);
 });
 }
 
-function fireworks(){
-for(let i=0;i<25;i++){
-let fw=document.createElement("div");
-fw.className="firework";
-fw.style.left=Math.random()*window.innerWidth+"px";
-fw.style.top=Math.random()*window.innerHeight+"px";
-document.body.appendChild(fw);
-setTimeout(()=>fw.remove(),1000);
+function clearLeaderboard(){
+localStorage.removeItem("bibleLeaderboard");
+showLeaderboard();
 }
+
+function toggleMusic(){
+let music=document.getElementById("bgMusic");
+let btn=document.getElementById("musicBtn");
+if(music.paused){ music.play(); btn.classList.remove("off"); }
+else{ music.pause(); btn.classList.add("off"); }
+}
+
+/* Advanced Fireworks */
+function fireworks(){
+for(let i=0;i<8;i++){
+setTimeout(()=>{
+createExplosion(Math.random()*window.innerWidth, Math.random()*window.innerHeight/2);
+},i*400);
+}
+}
+
+function createExplosion(x,y){
+for(let i=0;i<80;i++){
+let p=document.createElement("div");
+p.className="firework-particle";
+document.body.appendChild(p);
+p.style.background=randomColor();
+
+let angle=Math.random()*2*Math.PI;
+let velocity=Math.random()*6+4;
+let vx=Math.cos(angle)*velocity;
+let vy=Math.sin(angle)*velocity;
+let gravity=0.05, friction=0.98;
+let posX=x, posY=y, opacity=1;
+
+function animate(){
+vx*=friction; vy*=friction; vy+=gravity;
+posX+=vx; posY+=vy; opacity-=0.015;
+p.style.left=posX+"px";
+p.style.top=posY+"px";
+p.style.opacity=opacity;
+if(opacity>0){ requestAnimationFrame(animate); }
+else{ p.remove(); }
+}
+animate();
+}
+}
+
+function randomColor(){
+let colors=["#ff0043","#14fc56","#1e90ff","#ffae00","#ffffff","#ff69b4"];
+return colors[Math.floor(Math.random()*colors.length)];
 }
 
 showLeaderboard();
